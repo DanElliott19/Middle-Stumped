@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Middle Stumped</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    .players {
+      display: flex;
+      justify-content: space-around;
+      margin: 1.5rem 0;
+    }
+    .players button {
+      padding: 1rem;
+      font-size: 1rem;
+      width: 45%;
+      cursor: pointer;
+    }
+    .score {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .message {
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .play-again {
+      margin-top: 2rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏏 Middle Stumped</h1>
+    <div class="score">Score: 0</div>
+    <div class="question">Who has scored more IPL runs?</div>
+    <div class="players">
+      <button id="playerA">Player A</button>
+      <button id="playerB">Player B</button>
+    </div>
+    <div class="message"></div>
+    <button class="play-again" onclick="startGame()">Play Again</button>
+  </div>
+
+  <script>
+    const players = [
+      { name: "Virat Kohli", runs: 7263 },
+      { name: "Shikhar Dhawan", runs: 6617 },
+      { name: "David Warner", runs: 6565 },
+      { name: "Rohit Sharma", runs: 6359 },
+      { name: "Suresh Raina", runs: 5528 },
+      { name: "MS Dhoni", runs: 5204 },
+      { name: "AB de Villiers", runs: 5162 },
+      { name: "Chris Gayle", runs: 4965 },
+      { name: "Faf du Plessis", runs: 4300 },
+      { name: "KL Rahul", runs: 4318 },
+    ];
+
+    let score = 0;
+    let currentPair = [];
+
+    const scoreDisplay = document.querySelector(".score");
+    const question = document.querySelector(".question");
+    const playerAButton = document.getElementById("playerA");
+    const playerBButton = document.getElementById("playerB");
+    const message = document.querySelector(".message");
+    const playAgainBtn = document.querySelector(".play-again");
+
+    function getRandomPair() {
+      let a, b;
+      do {
+        a = players[Math.floor(Math.random() * players.length)];
+        b = players[Math.floor(Math.random() * players.length)];
+      } while (a.name === b.name);
+      return [a, b];
+    }
+
+    function updateUI() {
+      [playerA, playerB] = currentPair;
+      playerAButton.textContent = playerA.name;
+      playerBButton.textContent = playerB.name;
+      scoreDisplay.textContent = `Score: ${score}`;
+      message.textContent = "";
+    }
+
+    function handleAnswer(selected) {
+      const [playerA, playerB] = currentPair;
+      const correct = playerA.runs > playerB.runs ? playerA : playerB;
+      const chosen = selected === "A" ? playerA : playerB;
+
+      if (chosen === correct) {
+        score += 6;
+        message.textContent = "✅ Correct! +6 runs";
+        setTimeout(nextQuestion, 1000);
+      } else {
+        if (Math.random() < 0.5) {
+          message.textContent = `❌ OUT! Final score: ${score}`;
+          endGame();
+        } else {
+          message.textContent = "❌ Wrong, but you survive!";
+          setTimeout(nextQuestion, 1000);
+        }
+      }
+    }
+
+    function nextQuestion() {
+      currentPair = getRandomPair();
+      updateUI();
+    }
+
+    function endGame() {
+      playerAButton.disabled = true;
+      playerBButton.disabled = true;
+      playAgainBtn.style.display = "inline-block";
+    }
+
+    function startGame() {
+      score = 0;
+      playAgainBtn.style.display = "none";
+      playerAButton.disabled = false;
+      playerBButton.disabled = false;
+      nextQuestion();
+    }
+
+    playerAButton.onclick = () => handleAnswer("A");
+    playerBButton.onclick = () => handleAnswer("B");
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
